@@ -1,0 +1,1379 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>MGSA Technology Investment Dashboard — Independent Portfolio Exercise</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --navy:#1B3A5C;--blue:#2E75B6;--purple:#5C3A7A;--teal:#0D6E6E;
+  --text:#1A1A1A;--text2:#595959;--border:#CCCCCC;
+  --bg:#F8F9FA;--bg2:#F2F2F2;
+  --rf:#F4CCCC;--rt:#A61C00;
+  --of:#FCE4D6;--ot:#C55A11;
+  --af:#FFF3CD;--at:#9C6500;
+  --gf:#D9EAD3;--gt:#1E6B3C;
+  --bf:#D6E4F0;--bt:#1B3A5C;
+  --pf:#EDE4F5;--pt:#5C3A7A;
+}
+body{font-family:Arial,Helvetica,sans-serif;font-size:14px;color:var(--text);background:#fff}
+
+/* ── HEADER ── */
+.pg-hdr{background:var(--navy);display:flex;flex-direction:column}
+.hdr-top{display:flex;justify-content:space-between;align-items:center;padding:14px 24px 0}
+.hdr-org{font-size:11px;font-weight:700;color:rgba(255,255,255,.65);letter-spacing:.1em;text-transform:uppercase}
+.hdr-ref{font-size:11px;color:rgba(255,255,255,.4);letter-spacing:.04em}
+.hdr-main{padding:12px 24px 0}
+.hdr-title{font-size:26px;font-weight:700;color:#fff;letter-spacing:-.3px}
+.hdr-sub{font-size:13px;color:rgba(255,255,255,.65);margin-top:4px}
+
+/* ── PURE-CSS TABS ── */
+.tab-radios{display:none}
+.tab-bar{display:flex;padding:0 24px;gap:0;overflow-x:auto;margin-top:12px}
+.tab{padding:12px 20px;font-size:13px;font-weight:700;cursor:pointer;color:rgba(255,255,255,.5);border-bottom:3px solid transparent;white-space:nowrap;font-family:Arial,Helvetica,sans-serif;transition:color .15s,border-color .15s;user-select:none}
+.tab:hover{color:rgba(255,255,255,.85)}
+.panel{display:none;padding:24px}
+
+#t1:checked ~ .pg-hdr .tab[for="t1"],
+#t2:checked ~ .pg-hdr .tab[for="t2"],
+#t3:checked ~ .pg-hdr .tab[for="t3"],
+#t4:checked ~ .pg-hdr .tab[for="t4"],
+#t5:checked ~ .pg-hdr .tab[for="t5"],
+#t6:checked ~ .pg-hdr .tab[for="t6"],
+#t7:checked ~ .pg-hdr .tab[for="t7"]
+{color:#fff;border-bottom-color:rgba(255,255,255,.9)}
+
+#t1:checked ~ #p1,
+#t2:checked ~ #p2,
+#t3:checked ~ #p3,
+#t4:checked ~ #p4,
+#t5:checked ~ #p5,
+#t6:checked ~ #p6,
+#t7:checked ~ #p7
+{display:block}
+
+/* ── METRIC CARDS ── */
+.mrow{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:12px;margin-bottom:20px}
+.mc{background:var(--bg);border:.5px solid var(--border);border-radius:6px;padding:14px 16px}
+.ml{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text2);margin-bottom:4px}
+.mv{font-size:24px;font-weight:700}
+.ms{font-size:11px;color:var(--text2);margin-top:3px}
+
+/* ── SECTION TITLE ── */
+.st{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--navy);margin-bottom:10px}
+
+/* ── BADGES ── */
+.badge{display:inline-block;font-size:11px;font-weight:700;padding:3px 9px;border-radius:3px;white-space:nowrap}
+.bc{background:var(--rf);color:var(--rt)}
+.bh{background:var(--of);color:var(--ot)}
+.bm{background:var(--af);color:var(--at)}
+.bg{background:var(--gf);color:var(--gt)}
+.bp{background:var(--bf);color:var(--bt)}
+.bpu{background:var(--pf);color:var(--pt)}
+
+/* ── TABLES ── */
+.tw{overflow-x:auto;border:.5px solid var(--border);border-radius:6px;margin-bottom:16px}
+.tw.sh{max-height:460px;overflow-y:auto}
+.dt{width:100%;border-collapse:collapse;font-size:12px}
+.dt th{background:var(--navy);color:#fff;padding:9px 10px;font-weight:700;font-size:11px;text-align:left;position:sticky;top:0;z-index:2;white-space:nowrap;letter-spacing:.05em;text-transform:uppercase}
+.dt td{padding:8px 10px;border-bottom:.5px solid var(--border);vertical-align:top}
+.dt tr:last-child td{border-bottom:none}
+.dt tr:hover td{background:var(--bg2)}
+.dt td.ctr{text-align:center;vertical-align:middle}
+.dt td.num{text-align:right;font-variant-numeric:tabular-nums;vertical-align:middle}
+.dt td.mid{vertical-align:middle}
+
+/* ── LAYOUT ── */
+.cg{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
+.cg3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:16px}
+.cb{background:var(--bg);border:.5px solid var(--border);border-radius:6px;padding:14px;margin-bottom:16px}
+.cb0{background:var(--bg);border:.5px solid var(--border);border-radius:6px;padding:14px;margin-bottom:0}
+
+/* ── CARDS ── */
+.card{background:#fff;border:.5px solid var(--border);border-left:4px solid;border-radius:6px;padding:12px 14px;margin-bottom:10px}
+.card:last-child{margin-bottom:0}
+.card-hdr{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:6px}
+.card-title{font-size:13px;font-weight:700;flex:1}
+.card-sub{font-size:12px;color:var(--text2);line-height:1.55}
+
+/* ── PROGRESS BARS ── */
+.cbar-wrap{margin-bottom:9px}
+.cbar-wrap:last-child{margin-bottom:0}
+.cbar-label{display:flex;justify-content:space-between;font-size:12px;margin-bottom:3px}
+.cbar{height:12px;background:var(--bg2);border-radius:3px;overflow:hidden}
+.cbar-fill{height:100%;border-radius:3px}
+
+/* ── STAT ROWS ── */
+.stat-row{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:.5px solid var(--border);font-size:12px}
+.stat-row:last-child{border-bottom:none}
+.stat-label{color:var(--text2);flex:1;padding-right:8px}
+.stat-val{font-weight:700;text-align:right;flex-shrink:0}
+
+/* ── NOTICES ── */
+.notice{border:.5px solid;border-radius:6px;padding:11px 13px;margin-bottom:10px;font-size:12px;line-height:1.6}
+.notice:last-child{margin-bottom:0}
+.notice-r{background:var(--rf);border-color:#E24B4A;color:var(--rt)}
+.notice-a{background:var(--of);border-color:#EF9F27;color:var(--ot)}
+.notice-g{background:var(--gf);border-color:#4CAF50;color:var(--gt)}
+.notice-b{background:var(--bf);border-color:var(--blue);color:var(--bt)}
+.notice-p{background:var(--pf);border-color:var(--purple);color:var(--pt)}
+
+/* ── RAG DOTS ── */
+.rag{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:5px;vertical-align:middle;flex-shrink:0}
+.rag-r{background:#E24B4A}
+.rag-a{background:#EF9F27}
+.rag-g{background:#4CAF50}
+.rag-b{background:#2E75B6}
+.rag-p{background:#5C3A7A}
+
+/* ── VALUE COLOURS ── */
+.v-g{color:var(--gt);font-weight:700}
+.v-a{color:var(--at);font-weight:700}
+.v-r{color:var(--rt);font-weight:700}
+.v-b{color:var(--bt);font-weight:700}
+
+/* ── ESCALATION FUNNEL ── */
+.funnel{display:flex;flex-direction:column;gap:6px}
+.funnel-tier{border-radius:4px;padding:10px 14px;display:flex;align-items:center;justify-content:space-between}
+.funnel-label{font-size:12px;font-weight:700}
+.funnel-count{font-size:20px;font-weight:700}
+.funnel-sub{font-size:11px;opacity:.8}
+.ft-1{background:var(--rf);color:var(--rt)}
+.ft-2{background:var(--of);color:var(--ot)}
+.ft-3{background:var(--af);color:var(--at)}
+.ft-4{background:var(--gf);color:var(--gt)}
+.ft-5{background:var(--bf);color:var(--bt)}
+
+/* ── OWNER BLOCK ── */
+.owner-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.owner-card{background:#fff;border:.5px solid var(--border);border-radius:6px;border-top:3px solid;padding:11px 13px}
+.owner-tier{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text2);margin-bottom:4px}
+.owner-name{font-size:13px;font-weight:700;margin-bottom:2px}
+.owner-role{font-size:11px;color:var(--text2);margin-bottom:6px}
+
+/* ── TIMELINE ── */
+.tl{position:relative;padding-left:22px}
+.tl::before{content:'';position:absolute;left:4px;top:6px;bottom:6px;width:2px;background:var(--border)}
+.tl-item{position:relative;margin-bottom:14px;padding-bottom:14px;border-bottom:.5px solid var(--border)}
+.tl-item:last-child{border-bottom:none;margin-bottom:0;padding-bottom:0}
+.tl-dot{position:absolute;left:-18px;top:3px;width:12px;height:12px;border-radius:50%;border:2px solid #fff}
+.tl-time{font-size:10px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:2px}
+.tl-actor{font-size:11px;color:var(--blue);font-weight:700;margin-bottom:2px}
+.tl-title{font-size:12px;font-weight:700;margin-bottom:2px}
+.tl-desc{font-size:12px;color:var(--text2);line-height:1.5}
+
+/* ── ESCALATION STATUS STRIP ── */
+.esc-strip{background:#fff;border:.5px solid var(--border);border-radius:6px;overflow:hidden}
+.esc-hdr{display:grid;grid-template-columns:90px 100px 1fr 110px 90px 90px 90px;background:var(--navy);padding:8px 10px;gap:0}
+.esc-hdr span{font-size:11px;font-weight:700;color:#fff;text-transform:uppercase;letter-spacing:.05em}
+.esc-row{display:grid;grid-template-columns:90px 100px 1fr 110px 90px 90px 90px;padding:8px 10px;border-bottom:.5px solid var(--border);font-size:12px;align-items:start;gap:0}
+.esc-row:last-child{border-bottom:none}
+.esc-row:hover{background:var(--bg2)}
+.esc-ref{font-weight:700}
+.esc-age{color:var(--text2);font-size:11px}
+.esc-desc{line-height:1.5;padding:0 8px}
+.esc-owner{font-weight:700;font-size:11px;padding-right:6px}
+.esc-stat{text-align:center}
+.esc-due{text-align:right;font-size:11px;color:var(--text2);padding-right:6px}
+.esc-pri{text-align:right}
+
+/* ── BREACH INDICATOR ── */
+.breach-pill{display:inline-block;font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px;white-space:nowrap}
+.breach-r{background:var(--rt);color:#fff}
+.breach-a{background:var(--ot);color:#fff}
+.breach-g{background:var(--gt);color:#fff}
+
+/* ── ACTION ROW ── */
+.act-row{display:flex;gap:10px;padding:9px 0;border-bottom:.5px solid var(--border);font-size:12px;align-items:flex-start}
+.act-row:last-child{border-bottom:none}
+.act-ref{min-width:72px;font-weight:700;flex-shrink:0;color:var(--navy)}
+.act-body{flex:1}
+.act-title{font-weight:700;margin-bottom:2px}
+.act-desc{color:var(--text2);line-height:1.5}
+.act-meta{display:flex;gap:8px;margin-top:4px;flex-wrap:wrap}
+
+/* ── RACI TABLE ── */
+.raci-g{background:var(--gf);color:var(--gt);font-weight:700;text-align:center;padding:6px;border:.5px solid var(--border);font-size:11px}
+.raci-b{background:var(--bf);color:var(--bt);font-weight:700;text-align:center;padding:6px;border:.5px solid var(--border);font-size:11px}
+.raci-a{background:var(--af);color:var(--at);font-weight:700;text-align:center;padding:6px;border:.5px solid var(--border);font-size:11px}
+.raci-n{background:var(--bg2);color:var(--text2);text-align:center;padding:6px;border:.5px solid var(--border);font-size:11px}
+.raci-hdr{background:var(--navy);color:#fff;font-size:11px;font-weight:700;text-align:center;padding:8px 6px;border:.5px solid var(--border);letter-spacing:.04em;white-space:nowrap}
+.raci-lbl{background:var(--bg);font-size:12px;font-weight:700;padding:8px 10px;border:.5px solid var(--border);vertical-align:middle}
+.raci-table{width:100%;border-collapse:collapse}
+
+p.intro{font-size:13px;color:var(--text2);margin-bottom:16px;line-height:1.6}
+
+/* ── INVESTMENT PORTFOLIO STRIP (8-col) ── */
+.inv-strip{background:#fff;border:.5px solid var(--border);border-radius:6px;overflow:hidden;margin-bottom:16px}
+.inv-hdr{display:grid;grid-template-columns:80px 160px 1fr 90px 100px 80px 80px 90px;background:var(--navy);padding:8px 10px;gap:0}
+.inv-hdr span{font-size:11px;font-weight:700;color:#fff;text-transform:uppercase;letter-spacing:.05em}
+.inv-row{display:grid;grid-template-columns:80px 160px 1fr 90px 100px 80px 80px 90px;padding:8px 10px;border-bottom:.5px solid var(--border);font-size:12px;align-items:start;gap:0}
+.inv-row:last-child{border-bottom:none}
+.inv-row:hover{background:var(--bg2)}
+.inv-ref{font-weight:700;color:var(--navy)}
+.inv-cat{font-size:11px;color:var(--text2)}
+.inv-desc{line-height:1.5;padding:0 8px}
+.inv-num{text-align:right;font-variant-numeric:tabular-nums;padding-right:6px}
+.inv-ctr{text-align:center}
+
+/* ── CAPEX PIPELINE STRIP (7-col) ── */
+.cap-strip{background:#fff;border:.5px solid var(--border);border-radius:6px;overflow:hidden;margin-bottom:16px}
+.cap-hdr{display:grid;grid-template-columns:80px 150px 1fr 100px 90px 90px 90px;background:var(--navy);padding:8px 10px;gap:0}
+.cap-hdr span{font-size:11px;font-weight:700;color:#fff;text-transform:uppercase;letter-spacing:.05em}
+.cap-row{display:grid;grid-template-columns:80px 150px 1fr 100px 90px 90px 90px;padding:8px 10px;border-bottom:.5px solid var(--border);font-size:12px;align-items:start;gap:0}
+.cap-row:last-child{border-bottom:none}
+.cap-row:hover{background:var(--bg2)}
+.cap-ref{font-weight:700;color:var(--navy)}
+.cap-cat{font-size:11px;color:var(--text2)}
+.cap-desc{line-height:1.5;padding:0 8px}
+.cap-num{text-align:right;font-variant-numeric:tabular-nums;padding-right:6px}
+.cap-ctr{text-align:center}
+
+/* ── BENEFIT TRACKING STRIP (6-col) ── */
+.ben-strip{background:#fff;border:.5px solid var(--border);border-radius:6px;overflow:hidden;margin-bottom:16px}
+.ben-hdr{display:grid;grid-template-columns:80px 160px 1fr 100px 100px 90px;background:var(--navy);padding:8px 10px;gap:0}
+.ben-hdr span{font-size:11px;font-weight:700;color:#fff;text-transform:uppercase;letter-spacing:.05em}
+.ben-row{display:grid;grid-template-columns:80px 160px 1fr 100px 100px 90px;padding:8px 10px;border-bottom:.5px solid var(--border);font-size:12px;align-items:start;gap:0}
+.ben-row:last-child{border-bottom:none}
+.ben-row:hover{background:var(--bg2)}
+.ben-ref{font-weight:700;color:var(--navy)}
+.ben-cat{font-size:11px;color:var(--text2)}
+.ben-desc{line-height:1.5;padding:0 8px}
+.ben-num{text-align:right;font-variant-numeric:tabular-nums;padding-right:6px}
+.ben-ctr{text-align:center}
+
+/* ── VENDOR CONTRACT STRIP (6-col) ── */
+.vnd-strip{background:#fff;border:.5px solid var(--border);border-radius:6px;overflow:hidden;margin-bottom:16px}
+.vnd-hdr{display:grid;grid-template-columns:150px 1fr 100px 100px 90px 90px;background:var(--navy);padding:8px 10px;gap:0}
+.vnd-hdr span{font-size:11px;font-weight:700;color:#fff;text-transform:uppercase;letter-spacing:.05em}
+.vnd-row{display:grid;grid-template-columns:150px 1fr 100px 100px 90px 90px;padding:8px 10px;border-bottom:.5px solid var(--border);font-size:12px;align-items:center;gap:0}
+.vnd-row:last-child{border-bottom:none}
+.vnd-row:hover{background:var(--bg2)}
+.vnd-name{font-weight:700}
+.vnd-svc{font-size:11px;color:var(--text2)}
+.vnd-num{text-align:right;font-variant-numeric:tabular-nums;padding-right:6px}
+.vnd-ctr{text-align:center}
+
+/* ── PORTFOLIO DISCLAIMER ── */
+.portfolio-disclaimer{
+  position:sticky;top:0;z-index:9999;width:100%;
+  background:#7A1F1F;color:#ffffff;
+  font-family:Arial,Helvetica,sans-serif;font-size:13px;line-height:1.5;
+  padding:10px 16px;box-sizing:border-box;text-align:center;
+  border-bottom:3px solid #4a1212;
+}
+.portfolio-disclaimer strong{font-weight:700}
+.portfolio-disclaimer a{color:#ffffff;text-decoration:underline;font-weight:700}
+@media (max-width:640px){.portfolio-disclaimer{font-size:12px;padding:10px 12px}}
+.portfolio-about{max-width:1100px;margin:32px auto 40px;padding:20px 24px;border:1px solid var(--border);border-left:4px solid #7A1F1F;background:var(--bg);font-size:13px;line-height:1.6;color:var(--text2);scroll-margin-top:90px}
+.portfolio-about h2{font-size:15px;color:var(--navy);margin-bottom:8px}
+.portfolio-about p+p{margin-top:8px}
+.pd-short{display:none}
+.cg>*,.cg3>*,.mrow>*{min-width:0}
+
+/* ── RESPONSIVE ── */
+@media (max-width:900px){
+  .cg3{grid-template-columns:1fr 1fr}
+}
+@media (max-width:760px){
+  .pd-full{display:none}.pd-short{display:inline}
+  .cg,.cg3,.owner-grid{grid-template-columns:1fr}
+  .panel{padding:16px}
+  .hdr-top{flex-wrap:wrap;gap:4px;padding:12px 16px 0}
+  .hdr-main{padding:10px 16px 0}.hdr-title{font-size:21px}
+  .tab-bar{padding:0 8px}.tab{padding:12px 14px}
+  .cb0,.cb{overflow-x:auto}
+  .esc-hdr,.esc-row,.inv-hdr,.inv-row,.cap-hdr,.cap-row,.ben-hdr,.ben-row,.vnd-hdr,.vnd-row,.raci-table{min-width:760px}
+  .dt{min-width:440px}
+  .stat-row{gap:10px}.stat-val{text-align:right}
+  .cbar-label{gap:10px}
+  .act-row{flex-wrap:wrap}
+  .portfolio-about{margin:24px 16px 32px;padding:16px}
+}
+</style>
+</head>
+<body>
+
+<div class="portfolio-disclaimer">
+  &#9888; <strong>Fictional company &amp; data &mdash; independent portfolio exercise by Divan Gerber.</strong>
+  <span class="pd-short">Not a role held or real employer information. All figures simulated; real vendor names used illustratively.</span>
+  <span class="pd-full">All organizations, figures, and scenarios on this site are simulated for demonstration purposes.
+  Not a role held or real employer information. This page names several real companies and products (including Microsoft Azure and Power BI, SAP, Oracle, AWS, Databricks, Cisco, Zebra Technologies, Dimension Data, Clickatell, Netstar, Axis Communications and Collibra) within an entirely fictional operational scenario. Every budget, spend figure, contract value, SLA breach, renewal position, benefit and investment decision shown is invented for this exercise and does not describe any real contract, breach, price or event involving those companies. The committee, Board and executive decisions and the roles shown are simulated scenario content, not decisions that happened. This is a static design prototype, not a live monitoring feed.</span>
+  <a href="#about-this-portfolio">Read more</a>
+</div>
+
+<input class="tab-radios" type="radio" name="tabs" id="t1" checked>
+<input class="tab-radios" type="radio" name="tabs" id="t2">
+<input class="tab-radios" type="radio" name="tabs" id="t3">
+<input class="tab-radios" type="radio" name="tabs" id="t4">
+<input class="tab-radios" type="radio" name="tabs" id="t5">
+<input class="tab-radios" type="radio" name="tabs" id="t6">
+<input class="tab-radios" type="radio" name="tabs" id="t7">
+
+<div class="pg-hdr">
+  <div class="hdr-top">
+    <div class="hdr-org">MedRetail Group South Africa (Fictional)</div>
+    <div class="hdr-ref">Independent Portfolio Exercise &nbsp;|&nbsp; Simulated period: June 2026</div>
+  </div>
+  <div class="hdr-main">
+    <div class="hdr-title">Technology Investment Dashboard</div>
+    <div class="hdr-sub">R148M tech opex YTD &bull; R284M capex YTD &bull; R6.4M analytics value realised &bull; 3 urgent decisions (7 pending) &bull; 8 contracts due renewal &bull; Simulated snapshot: 22 Jun 2026 (static data, not a live feed)</div>
+  </div>
+  <div class="tab-bar">
+    <label class="tab" for="t1">Investment Overview</label>
+    <label class="tab" for="t2">Opex &amp; Run Costs</label>
+    <label class="tab" for="t3">CapEx Portfolio</label>
+    <label class="tab" for="t4">Benefit Realisation</label>
+    <label class="tab" for="t5">Vendor Contracts</label>
+    <label class="tab" for="t6">Investment Decisions</label>
+    <label class="tab" for="t7">Governance &amp; Controls</label>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════
+     PANEL 1 — INVESTMENT OVERVIEW
+═══════════════════════════════════════════ -->
+<div class="panel" id="p1">
+
+  <div class="notice notice-a">
+    <strong>3 urgent technology investment decisions (of 7 pending) need CTO / CIO / CDO sign-off:</strong> Azure GPU reservation for AI Demand Forecasting v2 (R620k p.a., CTO &mdash; due 30 Jun), Oracle DB contract renewal or AWS RDS migration (R1.8M impact, CIO &mdash; due 15 Jul), and Power BI Premium P3 capacity upgrade (R380k p.a., CDO &mdash; due 30 Jun). Combined FY2026 risk if delayed: R2.3M AI and analytics value at risk.
+  </div>
+  <div class="notice notice-b" style="margin-top:10px">
+    <strong>Technology cost ratio at 9.0% of revenue &mdash; about 70bps over the 8.3% target.</strong> Primary drivers: Azure analytics cloud overspend (+R6.3M YTD vs plan), unplanned emergency changes (4 in June adding R180k), and infrastructure overtime (112h in June). CFO and CIO joint cost review scheduled 5 Jul 2026.
+  </div>
+
+  <div class="mrow" style="margin-top:16px">
+    <div class="mc"><div class="ml">Total Tech Spend YTD</div><div class="mv v-a">R432M</div><div class="ms">Opex R148M + Capex R284M</div></div>
+    <div class="mc"><div class="ml">Opex vs Budget (YTD)</div><div class="mv v-a">+R12M</div><div class="ms">8.8% over plan</div></div>
+    <div class="mc"><div class="ml">Capex vs Budget (YTD)</div><div class="mv v-g">-R26M</div><div class="ms">Under plan at midyear</div></div>
+    <div class="mc"><div class="ml">Tech Cost / Revenue</div><div class="mv v-a">9.0%</div><div class="ms">Opex + capex; target &le;8.3%</div></div>
+    <div class="mc"><div class="ml">Benefits Realised YTD</div><div class="mv v-a">R51M</div><div class="ms">vs R74M H1 target</div></div>
+    <div class="mc"><div class="ml">ROI (Tech Programme)</div><div class="mv v-a">+9.5%</div><div class="ms">Target: &ge;+15% FY</div></div>
+    <div class="mc"><div class="ml">Urgent Decisions Pending</div><div class="mv v-a">3</div><div class="ms">Of 7 pending &bull; due Jun&ndash;Jul</div></div>
+    <div class="mc"><div class="ml">Contracts Due Renewal</div><div class="mv v-a">8</div><div class="ms">Next 6 months</div></div>
+  </div>
+
+  <div class="cg">
+    <div>
+      <div class="cb">
+        <div class="st">Technology spend by category &mdash; YTD June 2026 (opex R148M + capex R284M = R432M)</div>
+        <div class="cbar-wrap">
+          <div class="cbar-label"><span>Cloud (Azure + Databricks, opex)</span><span style="font-weight:700">R48.9M (11.3%)</span></div>
+          <div class="cbar"><div class="cbar-fill" style="width:39%;background:var(--navy)"></div></div>
+        </div>
+        <div class="cbar-wrap">
+          <div class="cbar-label"><span>Staff costs (tech &amp; data, opex)</span><span style="font-weight:700">R47.4M (11.0%)</span></div>
+          <div class="cbar"><div class="cbar-fill" style="width:38%;background:var(--navy)"></div></div>
+        </div>
+        <div class="cbar-wrap">
+          <div class="cbar-label"><span>Licences, AMS &amp; vendor support (opex)</span><span style="font-weight:700">R39.9M (9.2%)</span></div>
+          <div class="cbar"><div class="cbar-fill" style="width:32%;background:var(--blue)"></div></div>
+        </div>
+        <div class="cbar-wrap">
+          <div class="cbar-label"><span>Security tools, misc. &amp; unplanned (opex)</span><span style="font-weight:700">R11.8M (2.7%)</span></div>
+          <div class="cbar"><div class="cbar-fill" style="width:10%;background:#888"></div></div>
+        </div>
+        <div class="cbar-wrap">
+          <div class="cbar-label"><span>Store &amp; retail capex</span><span style="font-weight:700">R124M (28.7%)</span></div>
+          <div class="cbar"><div class="cbar-fill" style="width:100%;background:var(--teal)"></div></div>
+        </div>
+        <div class="cbar-wrap">
+          <div class="cbar-label"><span>Platform &amp; product capex (loyalty, digital, supply chain, clinical)</span><span style="font-weight:700">R117M (27.1%)</span></div>
+          <div class="cbar"><div class="cbar-fill" style="width:94%;background:var(--teal)"></div></div>
+        </div>
+        <div class="cbar-wrap">
+          <div class="cbar-label"><span>AI &amp; data capability capex</span><span style="font-weight:700">R24M (5.6%)</span></div>
+          <div class="cbar"><div class="cbar-fill" style="width:19%;background:var(--at)"></div></div>
+        </div>
+        <div class="cbar-wrap">
+          <div class="cbar-label"><span>Security, compliance &amp; infrastructure capex</span><span style="font-weight:700">R19M (4.4%)</span></div>
+          <div class="cbar"><div class="cbar-fill" style="width:15%;background:var(--purple)"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:16px">
+      <div class="cb">
+        <div class="st">Investment by strategic theme &mdash; YTD June 2026 (R337M of R432M; staff, licence and support run costs excluded)</div>
+        <div class="funnel">
+          <div class="funnel-tier ft-4">
+            <div><div class="funnel-label">Retail &amp; Store Modernisation</div><div class="funnel-sub">4 new stores &bull; 8 refurbishments</div></div>
+            <div class="funnel-count">R124M</div>
+          </div>
+          <div class="funnel-tier ft-5">
+            <div><div class="funnel-label">Platform &amp; ERP Investments</div><div class="funnel-sub">SAP &bull; POS &bull; Loyalty &bull; CRM &bull; Clinical IT</div></div>
+            <div class="funnel-count">R117M</div>
+          </div>
+          <div class="funnel-tier ft-3">
+            <div><div class="funnel-label">Cloud &amp; Infrastructure</div><div class="funnel-sub">Azure &bull; Network &bull; DC refresh</div></div>
+            <div class="funnel-count">R53.9M</div>
+          </div>
+          <div class="funnel-tier ft-2">
+            <div><div class="funnel-label">AI &amp; Data Capability</div><div class="funnel-sub">Models &bull; Data eng &bull; Skills</div></div>
+            <div class="funnel-count">R24M</div>
+          </div>
+          <div class="funnel-tier ft-1">
+            <div><div class="funnel-label">Security &amp; Compliance</div><div class="funnel-sub">POPIA &bull; Patching &bull; SIEM</div></div>
+            <div class="funnel-count">R18.1M</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="cb0">
+        <div class="st">Spend vs budget &mdash; monthly YTD (R million total tech; YTD R432M vs R446M budget = &minus;R14M)</div>
+        <div class="tw" style="margin-bottom:0">
+          <table class="dt">
+            <thead>
+              <tr>
+                <th>Month</th>
+                <th class="num">Budget (R)</th>
+                <th class="num">Actual (R)</th>
+                <th class="num">Variance (R)</th>
+                <th class="ctr">Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td class="mid">Jan 2026</td><td class="num">72M</td><td class="num">66M</td><td class="num v-g">-6M</td><td class="ctr"><span class="badge bg">Under</span></td></tr>
+              <tr><td class="mid">Feb 2026</td><td class="num">68M</td><td class="num">63M</td><td class="num v-g">-5M</td><td class="ctr"><span class="badge bg">Under</span></td></tr>
+              <tr><td class="mid">Mar 2026</td><td class="num">76M</td><td class="num">75M</td><td class="num v-g">-1M</td><td class="ctr"><span class="badge bg">Under</span></td></tr>
+              <tr><td class="mid">Apr 2026</td><td class="num">76M</td><td class="num">71M</td><td class="num v-g">-5M</td><td class="ctr"><span class="badge bg">Under</span></td></tr>
+              <tr><td class="mid">May 2026</td><td class="num">78M</td><td class="num">80M</td><td class="num v-a">+2M</td><td class="ctr"><span class="badge bh">Over</span></td></tr>
+              <tr><td class="mid"><strong>Jun 2026</strong></td><td class="num"><strong>76M</strong></td><td class="num v-a"><strong>77M</strong></td><td class="num v-a"><strong>+1M</strong></td><td class="ctr"><span class="badge bh">Over</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 6-month trend table -->
+  <div class="cb0">
+    <div class="st">Technology investment KPI trend &mdash; January to June 2026</div>
+    <div class="tw" style="margin-bottom:0">
+      <table class="dt">
+        <thead>
+          <tr>
+            <th>Month</th>
+            <th class="num">Opex (R)</th>
+            <th class="num">Capex (R)</th>
+            <th class="num">Total Spend (R)</th>
+            <th class="num">Tech Cost / Rev</th>
+            <th class="num">Benefits Realised (R)</th>
+            <th class="num">Azure Analytics Spend (R)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td class="mid">Jan 2026</td><td class="num">22M</td><td class="num">44M</td><td class="num">66M</td><td class="num">8.7%</td><td class="num">6.2M</td><td class="num">920k</td></tr>
+          <tr><td class="mid">Feb 2026</td><td class="num">21M</td><td class="num">42M</td><td class="num">63M</td><td class="num">8.5%</td><td class="num">5.8M</td><td class="num">950k</td></tr>
+          <tr><td class="mid">Mar 2026</td><td class="num">25M</td><td class="num">50M</td><td class="num">75M</td><td class="num">9.2%</td><td class="num">7.1M</td><td class="num">1.00M</td></tr>
+          <tr><td class="mid">Apr 2026</td><td class="num">24M</td><td class="num">47M</td><td class="num">71M</td><td class="num">8.9%</td><td class="num">7.4M</td><td class="num">1.04M</td></tr>
+          <tr><td class="mid">May 2026</td><td class="num">28M</td><td class="num">52M</td><td class="num">80M</td><td class="num">9.5%</td><td class="num">7.2M</td><td class="num">1.08M</td></tr>
+          <tr><td class="mid"><strong>Jun 2026</strong></td><td class="num v-a"><strong>28M</strong></td><td class="num"><strong>49M</strong></td><td class="num v-a"><strong>77M</strong></td><td class="num v-a"><strong>8.9%</strong></td><td class="num v-g"><strong>7.3M</strong></td><td class="num v-a"><strong>1.12M</strong></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+
+
+<!-- ══════════════════════════════════════════
+     PANEL 2 — OPEX & RUN COSTS
+═══════════════════════════════════════════ -->
+<div class="panel" id="p2">
+
+  <p class="intro">Technology operating expenditure (opex) covers all recurring costs to run the existing technology estate: cloud infrastructure, software licences, vendor support contracts, managed services, and technology staff costs. Opex is budgeted annually and tracked monthly against business unit allocations. The technology opex ratio (opex as a percentage of Group revenue) is a primary efficiency KPI reviewed by the CFO monthly.</p>
+
+  <div class="mrow">
+    <div class="mc"><div class="ml">Total Tech Opex YTD</div><div class="mv v-a">R148M</div><div class="ms">vs R136M budget</div></div>
+    <div class="mc"><div class="ml">Opex vs Budget</div><div class="mv v-r">+R12M</div><div class="ms">+8.8% over plan</div></div>
+    <div class="mc"><div class="ml">Opex / Revenue (YTD)</div><div class="mv v-a">3.1%</div><div class="ms">Target &le;2.8%</div></div>
+    <div class="mc"><div class="ml">Cloud Spend YTD</div><div class="mv v-a">R48.9M</div><div class="ms">Azure + Databricks</div></div>
+    <div class="mc"><div class="ml">Cloud vs Budget</div><div class="mv v-r">+R6.3M</div><div class="ms">+14.8% over plan</div></div>
+    <div class="mc"><div class="ml">Licence &amp; AMS Spend YTD</div><div class="mv">R23.3M</div><div class="ms">M365, Power BI, SAP &bull; +R0.1M</div></div>
+    <div class="mc"><div class="ml">Staff Costs YTD</div><div class="mv">R47.4M</div><div class="ms">Incl. contractors</div></div>
+    <div class="mc"><div class="ml">Managed Services YTD</div><div class="mv">R16.6M</div><div class="ms">Network managed + vendor support</div></div>
+  </div>
+
+  <div class="cg">
+    <div class="cb">
+      <div class="st">Opex category vs budget &mdash; YTD June 2026</div>
+      <div class="tw" style="margin-bottom:0">
+        <table class="dt">
+          <thead>
+            <tr>
+              <th>Category</th>
+              <th class="num">Budget YTD (R)</th>
+              <th class="num">Actual YTD (R)</th>
+              <th class="num">Variance (R)</th>
+              <th class="ctr">Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td class="mid">Azure cloud (Synapse, ADF, Lake)</td><td class="num">32.4M</td><td class="num v-a">36.8M</td><td class="num v-r">+4.4M</td><td class="ctr"><span class="badge bc">Over</span></td></tr>
+            <tr><td class="mid">Databricks (analytics &amp; ML)</td><td class="num">10.2M</td><td class="num v-a">12.1M</td><td class="num v-r">+1.9M</td><td class="ctr"><span class="badge bc">Over</span></td></tr>
+            <tr><td class="mid">Microsoft 365 &amp; Power BI licences</td><td class="num">8.4M</td><td class="num">8.2M</td><td class="num v-g">-0.2M</td><td class="ctr"><span class="badge bg">Under</span></td></tr>
+            <tr><td class="mid">SAP licences &amp; AMS support</td><td class="num">14.8M</td><td class="num">15.1M</td><td class="num v-a">+0.3M</td><td class="ctr"><span class="badge bm">On track</span></td></tr>
+            <tr><td class="mid">Dimension Data (network managed)</td><td class="num">7.2M</td><td class="num">7.0M</td><td class="num v-g">-0.2M</td><td class="ctr"><span class="badge bg">Under</span></td></tr>
+            <tr><td class="mid">Vendor support contracts</td><td class="num">9.8M</td><td class="num">9.6M</td><td class="num v-g">-0.2M</td><td class="ctr"><span class="badge bg">Under</span></td></tr>
+            <tr><td class="mid">Tech staff costs (perm)</td><td class="num">38.2M</td><td class="num">38.8M</td><td class="num v-a">+0.6M</td><td class="ctr"><span class="badge bm">On track</span></td></tr>
+            <tr><td class="mid">Tech staff (contractors)</td><td class="num">7.4M</td><td class="num">8.6M</td><td class="num v-r">+1.2M</td><td class="ctr"><span class="badge bc">Over</span></td></tr>
+            <tr><td class="mid">Security tools &amp; SIEM</td><td class="num">4.2M</td><td class="num">4.1M</td><td class="num v-g">-0.1M</td><td class="ctr"><span class="badge bg">Under</span></td></tr>
+            <tr><td class="mid">Miscellaneous &amp; unplanned</td><td class="num">3.4M</td><td class="num v-r">7.7M</td><td class="num v-r">+4.3M</td><td class="ctr"><span class="badge bc">Over</span></td></tr>
+            <tr><td class="mid"><strong>Total Opex</strong></td><td class="num"><strong>136.0M</strong></td><td class="num v-a"><strong>148.0M</strong></td><td class="num v-r"><strong>+12.0M</strong></td><td class="ctr"><span class="badge bc">Over</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div>
+      <div class="cb">
+        <div class="st">Top opex overspend drivers &mdash; root causes</div>
+        <div class="card" style="border-left-color:var(--rt)">
+          <div class="card-hdr"><span class="card-title">Azure analytics cloud overspend &mdash; R6.3M over plan</span><span class="badge bc">Primary driver</span></div>
+          <div class="card-sub">Azure Synapse SQL pool and Databricks DBU consumption growing faster than planned. Root cause: Power BI dataset multiplicity (482 reports pulling independent SQL) and idle Databricks cluster auto-termination not configured. Cost optimisation review due 15 Jul. Potential saving: R2.5M p.a.</div>
+        </div>
+        <div class="card" style="border-left-color:var(--rt)">
+          <div class="card-hdr"><span class="card-title">Contractor costs &mdash; R1.2M over plan</span><span class="badge bc">Secondary driver</span></div>
+          <div class="card-sub">4 unplanned contractor extensions: 2 Infra engineers (covering open FTE vacancies), 1 SAP basis contractor (clinical system emergency), and 1 data engineering contractor (patient deduplication project). Will resolve on FTE hire completions (Jul&ndash;Aug 2026).</div>
+        </div>
+        <div class="card" style="border-left-color:var(--ot)">
+          <div class="card-hdr"><span class="card-title">Unplanned &amp; miscellaneous &mdash; R4.3M over plan</span><span class="badge bh">Significant</span></div>
+          <div class="card-sub">Includes (R0.92M itemised of R4.3M): 4 emergency change costs (R180k), Zebra label API failover workaround infrastructure (R220k), clinical data deduplication tooling (R380k), and 3 unplanned vendor callout fees (R140k). None were in original budget.</div>
+        </div>
+      </div>
+
+      <div class="cb0">
+        <div class="st">Azure cost optimisation opportunities &mdash; H2 2026</div>
+        <div class="stat-row"><span class="stat-label">Databricks idle cluster termination fix</span><span class="stat-val v-g">R640k saving</span></div>
+        <div class="stat-row"><span class="stat-label">Synapse DWU auto-pause configuration</span><span class="stat-val v-g">R480k saving</span></div>
+        <div class="stat-row"><span class="stat-label">ADF pipeline trigger rationalisation</span><span class="stat-val v-g">R220k saving</span></div>
+        <div class="stat-row"><span class="stat-label">Reserved instance conversion (1-year)</span><span class="stat-val v-g">R840k saving</span></div>
+        <div class="stat-row"><span class="stat-label">Power BI dataset consolidation (reduce SQL)</span><span class="stat-val v-g">R320k saving</span></div>
+        <div class="stat-row"><span class="stat-label"><strong>Total potential annual saving</strong></span><span class="stat-val v-g"><strong>R2.5M p.a.</strong></span></div>
+        <div class="stat-row"><span class="stat-label">Review due date</span><span class="stat-val">15 Jul 2026</span></div>
+        <div class="stat-row"><span class="stat-label">Owner</span><span class="stat-val">Analytics Platform Lead / CDO</span></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+
+<!-- ══════════════════════════════════════════
+     PANEL 3 — CAPEX PORTFOLIO
+═══════════════════════════════════════════ -->
+<div class="panel" id="p3">
+
+  <p class="intro">Capital expenditure (capex) covers technology investments that create enduring assets: new store build-outs, platform implementations, infrastructure upgrades, and software that is capitalised per the Group&rsquo;s IFRS accounting policy. All capex projects above R500k require a Board-approved business case. The Technology Investment Committee (TIC), chaired by the CIO, reviews capex monthly against approved budgets and benefits cases.</p>
+
+  <div class="mrow">
+    <div class="mc"><div class="ml">Capex Budget (FY2026)</div><div class="mv">R620M</div><div class="ms">Board approved</div></div>
+    <div class="mc"><div class="ml">Capex Spent YTD</div><div class="mv v-g">R284M</div><div class="ms">46% utilised (midyear)</div></div>
+    <div class="mc"><div class="ml">Capex vs Budget (YTD)</div><div class="mv v-g">-R26M</div><div class="ms">Under plan at H1</div></div>
+    <div class="mc"><div class="ml">Projects On Track</div><div class="mv v-g">7</div><div class="ms">Delivering to plan</div></div>
+    <div class="mc"><div class="ml">Projects At Risk</div><div class="mv v-a">4</div><div class="ms">Delayed or over budget</div></div>
+    <div class="mc"><div class="ml">Projects On Hold</div><div class="mv v-a">2</div><div class="ms">Pending decision</div></div>
+    <div class="mc"><div class="ml">New Capex Requests</div><div class="mv">3</div><div class="ms">TIC approval pending</div></div>
+    <div class="mc"><div class="ml">Forecast Outturn (FY)</div><div class="mv v-g">R596M</div><div class="ms">R24M under budget</div></div>
+  </div>
+
+  <!-- Capex portfolio strip -->
+  <div class="cap-strip">
+    <div class="cap-hdr">
+      <span>Proj #</span>
+      <span>Category</span>
+      <span>Project Name</span>
+      <span class="cap-num">Budget (R)</span>
+      <span class="cap-num">Spent YTD (R)</span>
+      <span class="cap-ctr">% Used</span>
+      <span class="cap-ctr">Status</span>
+    </div>
+    <!-- On track -->
+    <div class="cap-row">
+      <div class="cap-ref">CAP-001</div>
+      <div class="cap-cat">Store Expansion</div>
+      <div class="cap-desc">New store builds &mdash; 4 stores (Centurion, Roodepoort, Umhlanga, KN)</div>
+      <div class="cap-num">88M</div><div class="cap-num v-g">38M</div><div class="cap-ctr">43%</div>
+      <div class="cap-ctr"><span class="badge bg">On Track</span></div>
+    </div>
+    <div class="cap-row">
+      <div class="cap-ref">CAP-002</div>
+      <div class="cap-cat">Store Refresh</div>
+      <div class="cap-desc">Store refurbishment programme &mdash; 8 stores (POS, fixtures, clinical area)</div>
+      <div class="cap-num">36M</div><div class="cap-num v-g">18M</div><div class="cap-ctr">50%</div>
+      <div class="cap-ctr"><span class="badge bg">On Track</span></div>
+    </div>
+    <div class="cap-row">
+      <div class="cap-ref">CAP-003</div>
+      <div class="cap-cat">Loyalty Platform</div>
+      <div class="cap-desc">Smart Card loyalty platform v3 upgrade &mdash; new CRM and offer engine</div>
+      <div class="cap-num">22M</div><div class="cap-num v-g">11M</div><div class="cap-ctr">50%</div>
+      <div class="cap-ctr"><span class="badge bg">On Track</span></div>
+    </div>
+    <div class="cap-row">
+      <div class="cap-ref">CAP-004</div>
+      <div class="cap-cat">Supply Chain</div>
+      <div class="cap-desc">WMS upgrade and DC4 RFID integration &mdash; 6 DC sites</div>
+      <div class="cap-num">31M</div><div class="cap-num v-g">14M</div><div class="cap-ctr">45%</div>
+      <div class="cap-ctr"><span class="badge bg">On Track</span></div>
+    </div>
+    <div class="cap-row">
+      <div class="cap-ref">CAP-005</div>
+      <div class="cap-cat">Digital</div>
+      <div class="cap-desc">E-commerce platform upgrade &mdash; new checkout engine and app</div>
+      <div class="cap-num">12M</div><div class="cap-num v-g">4M</div><div class="cap-ctr">33%</div>
+      <div class="cap-ctr"><span class="badge bg">On Track</span></div>
+    </div>
+    <div class="cap-row">
+      <div class="cap-ref">CAP-006</div>
+      <div class="cap-cat">Data &amp; Analytics</div>
+      <div class="cap-desc">AI &amp; data capability build &mdash; models, data eng., skills programme</div>
+      <div class="cap-num">24M</div><div class="cap-num v-g">12M</div><div class="cap-ctr">50%</div>
+      <div class="cap-ctr"><span class="badge bh">At Risk</span></div>
+    </div>
+    <div class="cap-row">
+      <div class="cap-ref">CAP-007</div>
+      <div class="cap-cat">Security</div>
+      <div class="cap-desc">POPIA &amp; data governance programme &mdash; DLP, consent management</div>
+      <div class="cap-num">14M</div><div class="cap-num v-g">7M</div><div class="cap-ctr">50%</div>
+      <div class="cap-ctr"><span class="badge bh">At Risk</span></div>
+    </div>
+    <div class="cap-row">
+      <div class="cap-ref">CAP-008</div>
+      <div class="cap-cat">HR Systems</div>
+      <div class="cap-desc">SAP HCM self-service portal &mdash; leave, payslips, performance</div>
+      <div class="cap-num">8M</div><div class="cap-num v-g">4M</div><div class="cap-ctr">50%</div>
+      <div class="cap-ctr"><span class="badge bg">On Track</span></div>
+    </div>
+    <div class="cap-row">
+      <div class="cap-ref">CAP-009</div>
+      <div class="cap-cat">ERP</div>
+      <div class="cap-desc">SAP S/4HANA migration feasibility and scoping study</div>
+      <div class="cap-num">6M</div><div class="cap-num v-g">2M</div><div class="cap-ctr">33%</div>
+      <div class="cap-ctr"><span class="badge bg">On Track</span></div>
+    </div>
+    <!-- At risk -->
+    <div class="cap-row">
+      <div class="cap-ref">CAP-010</div>
+      <div class="cap-cat">Clinical IT</div>
+      <div class="cap-desc">Clinical dispensing system upgrade &mdash; RxElite v4.6.1 and label integration</div>
+      <div class="cap-num">28M</div><div class="cap-num v-r">16M</div><div class="cap-ctr">57%</div>
+      <div class="cap-ctr"><span class="badge bc">At Risk</span></div>
+    </div>
+    <div class="cap-row">
+      <div class="cap-ref">CAP-011</div>
+      <div class="cap-cat">Infrastructure</div>
+      <div class="cap-desc">DC1 core switch refresh (EoS Aug 2026) &mdash; Cisco upgrade</div>
+      <div class="cap-num">5M</div><div class="cap-num v-a">2M</div><div class="cap-ctr">40%</div>
+      <div class="cap-ctr"><span class="badge bh">At Risk</span></div>
+    </div>
+    <div class="cap-row">
+      <div class="cap-ref">CAP-012</div>
+      <div class="cap-cat">AI / Cloud</div>
+      <div class="cap-desc">Azure GPU cluster for AI Demand Forecasting v2 (AI-013)</div>
+      <div class="cap-num">4M</div><div class="cap-num v-r">1.8M</div><div class="cap-ctr">45%</div>
+      <div class="cap-ctr"><span class="badge bc">On Hold</span></div>
+    </div>
+    <div class="cap-row">
+      <div class="cap-ref">CAP-013</div>
+      <div class="cap-cat">Infrastructure</div>
+      <div class="cap-desc">Infrastructure refresh programme &mdash; server estate and UPS</div>
+      <div class="cap-num">5M</div><div class="cap-num v-a">2M</div><div class="cap-ctr">40%</div>
+      <div class="cap-ctr"><span class="badge bm">Paused</span></div>
+    </div>
+  </div>
+
+  <div class="cg" style="margin-bottom:0">
+    <div class="cb0">
+      <div class="st">At-risk project detail</div>
+      <div class="card" style="border-left-color:var(--rt)">
+        <div class="card-hdr"><span class="card-title">CAP-010 &mdash; Clinical IT Modernisation (57% spent, on hold)</span><span class="badge bc">At Risk</span></div>
+        <div class="card-sub">Clinical dispensing upgrade delayed by patient data quality (DQI-041) and P1 label print failure (INC-20640). R16M of R28M budget spent. Benefits delivery of R18M now at risk in FY26. Phased completion replanned to Q3&ndash;Q4. CIO to present revised plan at July TIC.</div>
+      </div>
+      <div class="card" style="border-left-color:var(--rt)">
+        <div class="card-hdr"><span class="card-title">CAP-012 &mdash; Azure GPU for AI Demand Forecasting v2</span><span class="badge bc">On Hold &mdash; CTO decision</span></div>
+        <div class="card-sub">R620k p.a. Azure NC-series reservation requires CTO sign-off. Business case approved by CFO. Model development complete (R1.8M spent). Decision by 30 Jun or R800k AI value target misses Q3 deployment window entirely.</div>
+      </div>
+      <div class="card" style="border-left-color:var(--ot)">
+        <div class="card-hdr"><span class="card-title">CAP-011 &mdash; DC1 Core Switch Refresh (EoS Aug 2026)</span><span class="badge bh">Urgent &mdash; Capex submission due</span></div>
+        <div class="card-sub">DC1 core switches reach Cisco end-of-support August 2026. Capex motivation (R1.4M estimated) to be submitted to CFO by 10 Jul for Sep Board approval. Cisco quote requested. Network team lead owns the submission. No patching post-EoS creates security risk.</div>
+      </div>
+    </div>
+    <div class="cb0">
+      <div class="st">Capex spend by category &mdash; YTD June 2026 (13 itemised projects total R131.8M of R284M; the rest sits in smaller projects not itemised)</div>
+      <div class="cbar-wrap">
+        <div class="cbar-label"><span>Store expansion &amp; refurbishment</span><span style="font-weight:700">R124M (43.7%)</span></div>
+        <div class="cbar"><div class="cbar-fill" style="width:100%;background:var(--navy)"></div></div>
+      </div>
+      <div class="cbar-wrap">
+        <div class="cbar-label"><span>Loyalty, digital &amp; CRM platforms</span><span style="font-weight:700">R57M (20.1%)</span></div>
+        <div class="cbar"><div class="cbar-fill" style="width:46%;background:var(--blue)"></div></div>
+      </div>
+      <div class="cbar-wrap">
+        <div class="cbar-label"><span>Supply chain &amp; WMS</span><span style="font-weight:700">R32M (11.3%)</span></div>
+        <div class="cbar"><div class="cbar-fill" style="width:26%;background:var(--teal)"></div></div>
+      </div>
+      <div class="cbar-wrap">
+        <div class="cbar-label"><span>Clinical IT</span><span style="font-weight:700">R28M (9.9%)</span></div>
+        <div class="cbar"><div class="cbar-fill" style="width:23%;background:var(--ot)"></div></div>
+      </div>
+      <div class="cbar-wrap">
+        <div class="cbar-label"><span>AI &amp; data capability</span><span style="font-weight:700">R24M (8.4%)</span></div>
+        <div class="cbar"><div class="cbar-fill" style="width:19%;background:var(--purple)"></div></div>
+      </div>
+      <div class="cbar-wrap">
+        <div class="cbar-label"><span>Security &amp; compliance</span><span style="font-weight:700">R14M (4.9%)</span></div>
+        <div class="cbar"><div class="cbar-fill" style="width:11%;background:#888"></div></div>
+      </div>
+      <div class="cbar-wrap">
+        <div class="cbar-label"><span>Infrastructure refresh</span><span style="font-weight:700">R5M (1.7%)</span></div>
+        <div class="cbar"><div class="cbar-fill" style="width:4%;background:#aaa"></div></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+
+<!-- ══════════════════════════════════════════
+     PANEL 4 — BENEFIT REALISATION
+═══════════════════════════════════════════ -->
+<div class="panel" id="p4">
+
+  <p class="intro">Technology benefit realisation tracks the quantified (simulated) business value delivered by technology investments against the benefits committed in approved business cases. Benefits are categorised as revenue enhancement, cost reduction, or risk reduction, and are validated by Finance quarterly. Benefits realisation is tracked from project go-live for 24 months. Under-realisation of more than 20% triggers a mandatory benefits review and recovery plan presentation to the TIC.</p>
+
+  <div class="mrow">
+    <div class="mc"><div class="ml">Benefits Target (FY2026)</div><div class="mv">R148M</div><div class="ms">Board committed</div></div>
+    <div class="mc"><div class="ml">Benefits Realised YTD</div><div class="mv v-a">R51M</div><div class="ms">vs R74M H1 target</div></div>
+    <div class="mc"><div class="ml">H1 Realisation Rate</div><div class="mv v-a">69%</div><div class="ms">Target: &ge;100%</div></div>
+    <div class="mc"><div class="ml">Revenue Enhancement YTD</div><div class="mv v-g">R35M</div><div class="ms">Retail, loyalty &amp; e-commerce</div></div>
+    <div class="mc"><div class="ml">Cost Reduction YTD</div><div class="mv v-g">R15M</div><div class="ms">Supply chain &amp; AI</div></div>
+    <div class="mc"><div class="ml">Risk Reduction YTD</div><div class="mv v-g">R1M</div><div class="ms">Compliance programme</div></div>
+    <div class="mc"><div class="ml">Benefits at Risk (FY)</div><div class="mv v-r">R38M</div><div class="ms">Clinical &amp; AI blocked</div></div>
+    <div class="mc"><div class="ml">On-Track Benefit Projects</div><div class="mv v-g">4</div><div class="ms">Delivering to plan</div></div>
+  </div>
+
+  <!-- Benefits tracking strip -->
+  <div class="ben-strip">
+    <div class="ben-hdr">
+      <span>Proj #</span>
+      <span>Category</span>
+      <span>Investment / Benefit Case</span>
+      <span class="ben-num">FY Target (R)</span>
+      <span class="ben-num">YTD Actual (R)</span>
+      <span class="ben-ctr">Status</span>
+    </div>
+    <div class="ben-row">
+      <div class="ben-ref">CAP-001</div>
+      <div class="ben-cat">Revenue</div>
+      <div class="ben-desc">New store builds &mdash; incremental revenue from 4 new trading stores</div>
+      <div class="ben-num">R28M</div><div class="ben-num v-g">R18M</div>
+      <div class="ben-ctr"><span class="badge bg">On Track</span></div>
+    </div>
+    <div class="ben-row">
+      <div class="ben-ref">CAP-003</div>
+      <div class="ben-cat">Revenue</div>
+      <div class="ben-desc">Loyalty platform upgrade &mdash; improved offer CTR and member spend</div>
+      <div class="ben-num">R18M</div><div class="ben-num v-g">R9M</div>
+      <div class="ben-ctr"><span class="badge bg">On Track</span></div>
+    </div>
+    <div class="ben-row">
+      <div class="ben-ref">CAP-004</div>
+      <div class="ben-cat">Cost</div>
+      <div class="ben-desc">Supply chain WMS &mdash; DIFOT improvement and overstock reduction</div>
+      <div class="ben-num">R22M</div><div class="ben-num v-g">R11M</div>
+      <div class="ben-ctr"><span class="badge bg">On Track</span></div>
+    </div>
+    <div class="ben-row">
+      <div class="ben-ref">CAP-005</div>
+      <div class="ben-cat">Revenue</div>
+      <div class="ben-desc">E-commerce upgrade &mdash; online revenue growth and conversion improvement</div>
+      <div class="ben-num">R12M</div><div class="ben-num v-g">R6M</div>
+      <div class="ben-ctr"><span class="badge bg">On Track</span></div>
+    </div>
+    <div class="ben-row">
+      <div class="ben-ref">CAP-006</div>
+      <div class="ben-cat">Cost / Risk</div>
+      <div class="ben-desc">AI &amp; data &mdash; models AI-001 to AI-008 value realised (excl. blocked)</div>
+      <div class="ben-num">R18M</div><div class="ben-num v-a">R4.2M</div>
+      <div class="ben-ctr"><span class="badge bh">Behind</span></div>
+    </div>
+    <div class="ben-row">
+      <div class="ben-ref">CAP-007</div>
+      <div class="ben-cat">Risk</div>
+      <div class="ben-desc">POPIA programme &mdash; regulatory risk reduction and audit finding remediation</div>
+      <div class="ben-num">R8M</div><div class="ben-num v-a">R1M</div>
+      <div class="ben-ctr"><span class="badge bh">Behind</span></div>
+    </div>
+    <div class="ben-row">
+      <div class="ben-ref">CAP-010</div>
+      <div class="ben-cat">Revenue / Risk</div>
+      <div class="ben-desc">Clinical IT modernisation &mdash; dispensing capacity, script throughput</div>
+      <div class="ben-num">R18M</div><div class="ben-num v-r">R2M</div>
+      <div class="ben-ctr"><span class="badge bc">At Risk</span></div>
+    </div>
+    <div class="ben-row">
+      <div class="ben-ref">CAP-008</div>
+      <div class="ben-cat">Cost</div>
+      <div class="ben-desc">SAP HCM self-service &mdash; HR admin time saving and payroll error reduction</div>
+      <div class="ben-num">R4M</div><div class="ben-num v-a">R0</div>
+      <div class="ben-ctr"><span class="badge bm">Pending Go-Live</span></div>
+    </div>
+    <div class="ben-row">
+      <div class="ben-ref">CAP-012</div>
+      <div class="ben-cat">Cost</div>
+      <div class="ben-desc">AI Demand Forecasting v2 &mdash; R800k incremental value over AI-003</div>
+      <div class="ben-num">R800k</div><div class="ben-num v-r">R0</div>
+      <div class="ben-ctr"><span class="badge bc">Blocked</span></div>
+    </div>
+  </div>
+
+  <div class="cg" style="margin-bottom:0">
+    <div class="cb0">
+      <div class="st">Benefits at risk &mdash; recovery analysis</div>
+      <div class="notice notice-r"><strong>R38M in benefits at risk for FY2026.</strong> Clinical IT (R16M) delayed by data quality and P1 incident. AI programme (R13.8M gap, plus R0.8M for Demand Forecasting v2) blocked by governance, data, and infrastructure. POPIA programme (R7M) behind plan. Recovery possible if clinical issues resolve in Q3 and AI unblocks by Aug.</div>
+      <div class="stat-row" style="margin-top:10px"><span class="stat-label">Benefits target FY2026</span><span class="stat-val">R148M</span></div>
+      <div class="stat-row"><span class="stat-label">Benefits realised YTD (Jun)</span><span class="stat-val v-a">R51M</span></div>
+      <div class="stat-row"><span class="stat-label">H2 benefits required to hit target</span><span class="stat-val">R97M</span></div>
+      <div class="stat-row"><span class="stat-label">H2 benefits currently forecast</span><span class="stat-val v-a">R100M (incl. store rev)</span></div>
+      <div class="stat-row"><span class="stat-label">Full-year outturn (base case)</span><span class="stat-val v-a">R151M</span></div>
+      <div class="stat-row"><span class="stat-label">Full-year outturn (risk case)</span><span class="stat-val v-r">R113M (if all blockers persist)</span></div>
+    </div>
+    <div class="cb0">
+      <div class="st">Benefits by category &mdash; YTD actuals vs annual targets</div>
+      <div class="cbar-wrap">
+        <div class="cbar-label"><span>Revenue enhancement</span><span class="v-g">R35M actual / R66M target</span></div>
+        <div class="cbar"><div class="cbar-fill" style="width:53%;background:var(--gt)"></div></div>
+      </div>
+      <div class="cbar-wrap">
+        <div class="cbar-label"><span>Cost reduction</span><span class="v-g">R15M actual / R54M target</span></div>
+        <div class="cbar"><div class="cbar-fill" style="width:28%;background:var(--blue)"></div></div>
+      </div>
+      <div class="cbar-wrap">
+        <div class="cbar-label"><span>Risk reduction</span><span class="v-g">R1M actual / R28M target</span></div>
+        <div class="cbar"><div class="cbar-fill" style="width:4%;background:var(--teal)"></div></div>
+      </div>
+      <div style="height:12px"></div>
+      <div class="st">Top performing investments (YTD benefit delivered)</div>
+      <div class="stat-row"><span class="stat-label">CAP-001 New store builds</span><span class="stat-val v-g">R18M</span></div>
+      <div class="stat-row"><span class="stat-label">CAP-004 Supply chain WMS</span><span class="stat-val v-g">R11M</span></div>
+      <div class="stat-row"><span class="stat-label">CAP-003 Loyalty platform upgrade</span><span class="stat-val v-g">R9M</span></div>
+      <div class="stat-row"><span class="stat-label">CAP-005 E-commerce upgrade</span><span class="stat-val v-g">R6M</span></div>
+      <div class="stat-row"><span class="stat-label">CAP-006 AI programme (live models)</span><span class="stat-val v-a">R4.2M</span></div>
+    </div>
+  </div>
+
+</div>
+
+
+<!-- ══════════════════════════════════════════
+     PANEL 5 — VENDOR CONTRACTS
+═══════════════════════════════════════════ -->
+<div class="panel" id="p5">
+
+  <p class="intro">Vendor contract management tracks all critical technology supplier agreements, including renewal dates, annual value, SLA performance, and any open commercial or governance issues. Contracts expiring within 6 months are flagged for renewal action. The Technology Investment Committee (TIC) reviews vendor performance quarterly. SLA breach credits are tracked separately and claimed in the following billing cycle under schedule provisions in each contract.</p>
+
+  <div class="mrow">
+    <div class="mc"><div class="ml">Critical Contracts Managed (table itemises 11, R199M of R284M)</div><div class="mv">18</div><div class="ms">By category</div></div>
+    <div class="mc"><div class="ml">Contracts Expiring &lt;6 Months</div><div class="mv v-a">8</div><div class="ms">Renewal action needed</div></div>
+    <div class="mc"><div class="ml">Contracts In SLA Breach</div><div class="mv v-r">2</div><div class="ms">Zebra &bull; Oracle</div></div>
+    <div class="mc"><div class="ml">Credits Receivable</div><div class="mv v-g">R18k</div><div class="ms">2 claims raised</div></div>
+    <div class="mc"><div class="ml">Total Annual Contract Value</div><div class="mv">R284M</div><div class="ms">All critical suppliers</div></div>
+    <div class="mc"><div class="ml">Contracts Under Renegotiation</div><div class="mv v-a">3</div><div class="ms">Oracle, Netstar, Zebra</div></div>
+  </div>
+
+  <!-- Vendor contract strip -->
+  <div class="vnd-strip">
+    <div class="vnd-hdr">
+      <span>Vendor</span>
+      <span>Service</span>
+      <span class="vnd-num">Annual Value (R)</span>
+      <span class="vnd-ctr">Expiry</span>
+      <span class="vnd-ctr">SLA Status</span>
+      <span class="vnd-ctr">Action</span>
+    </div>
+    <div class="vnd-row">
+      <div class="vnd-name">Microsoft</div>
+      <div class="vnd-svc">Azure IaaS, M365, Power BI Premium</div>
+      <div class="vnd-num">R84M</div><div class="vnd-ctr">Jan 2028</div>
+      <div class="vnd-ctr"><span class="badge bg">Met</span></div>
+      <div class="vnd-ctr"><span class="badge bm">Upgrade review</span></div>
+    </div>
+    <div class="vnd-row">
+      <div class="vnd-name">SAP SE</div>
+      <div class="vnd-svc">ERP AMS support &amp; licences</div>
+      <div class="vnd-num">R42M</div><div class="vnd-ctr">Jun 2028</div>
+      <div class="vnd-ctr"><span class="badge bg">Met</span></div>
+      <div class="vnd-ctr"><span class="badge bp">Active</span></div>
+    </div>
+    <div class="vnd-row">
+      <div class="vnd-name">Dimension Data</div>
+      <div class="vnd-svc">Network managed services</div>
+      <div class="vnd-num">R18M</div><div class="vnd-ctr">Dec 2026</div>
+      <div class="vnd-ctr"><span class="badge bg">Met</span></div>
+      <div class="vnd-ctr"><span class="badge bm">Renewal Q4</span></div>
+    </div>
+    <div class="vnd-row">
+      <div class="vnd-name">Oracle</div>
+      <div class="vnd-svc">DB Cloud Support (OCI)</div>
+      <div class="vnd-num">R14M</div><div class="vnd-ctr"><strong class="v-r">Aug 2026</strong></div>
+      <div class="vnd-ctr"><span class="badge bc">Breach</span></div>
+      <div class="vnd-ctr"><span class="badge bc">Decision Jul</span></div>
+    </div>
+    <div class="vnd-row">
+      <div class="vnd-name">Databricks</div>
+      <div class="vnd-svc">Analytics &amp; ML platform</div>
+      <div class="vnd-num">R12M</div><div class="vnd-ctr">Mar 2027</div>
+      <div class="vnd-ctr"><span class="badge bg">Met</span></div>
+      <div class="vnd-ctr"><span class="badge bm">Cost review</span></div>
+    </div>
+    <div class="vnd-row">
+      <div class="vnd-name">Zebra Technologies</div>
+      <div class="vnd-svc">Label print cloud API</div>
+      <div class="vnd-num">R8M</div><div class="vnd-ctr">Mar 2027</div>
+      <div class="vnd-ctr"><span class="badge bc">Breach</span></div>
+      <div class="vnd-ctr"><span class="badge bc">Escalated</span></div>
+    </div>
+    <div class="vnd-row">
+      <div class="vnd-name">Clickatell</div>
+      <div class="vnd-svc">SMS &amp; notification gateway</div>
+      <div class="vnd-num">R6M</div><div class="vnd-ctr">Nov 2027</div>
+      <div class="vnd-ctr"><span class="badge bg">Met</span></div>
+      <div class="vnd-ctr"><span class="badge bp">Active</span></div>
+    </div>
+    <div class="vnd-row">
+      <div class="vnd-name">Cisco</div>
+      <div class="vnd-svc">Network equipment &amp; SmartNet support</div>
+      <div class="vnd-num">R6M</div><div class="vnd-ctr">Oct 2026</div>
+      <div class="vnd-ctr"><span class="badge bg">Met</span></div>
+      <div class="vnd-ctr"><span class="badge bm">Renewal Q3</span></div>
+    </div>
+    <div class="vnd-row">
+      <div class="vnd-name">Netstar</div>
+      <div class="vnd-svc">Fleet telematics</div>
+      <div class="vnd-num">R4M</div><div class="vnd-ctr"><strong class="v-a">Jul 2026</strong></div>
+      <div class="vnd-ctr"><span class="badge bg">Met</span></div>
+      <div class="vnd-ctr"><span class="badge bc">Renew by 25 Jun</span></div>
+    </div>
+    <div class="vnd-row">
+      <div class="vnd-name">Axis Communications</div>
+      <div class="vnd-svc">CCTV &amp; access control</div>
+      <div class="vnd-num">R3M</div><div class="vnd-ctr">Feb 2027</div>
+      <div class="vnd-ctr"><span class="badge bg">Met</span></div>
+      <div class="vnd-ctr"><span class="badge bp">Active</span></div>
+    </div>
+    <div class="vnd-row">
+      <div class="vnd-name">Collibra</div>
+      <div class="vnd-svc">Data catalogue &amp; governance platform</div>
+      <div class="vnd-num">R2.4M</div><div class="vnd-ctr">Sep 2026</div>
+      <div class="vnd-ctr"><span class="badge bg">Met</span></div>
+      <div class="vnd-ctr"><span class="badge bm">Renewal Q3</span></div>
+    </div>
+  </div>
+
+  <div class="cg" style="margin-bottom:0">
+    <div class="cb0">
+      <div class="st">Priority contract actions &mdash; June / July 2026</div>
+      <div class="act-row">
+        <div class="act-ref">VND-01</div>
+        <div class="act-body">
+          <div class="act-title">Oracle &mdash; contract renewal vs AWS RDS migration decision</div>
+          <div class="act-desc">Contract expires Aug 2026. SLA breach on record (99.1% vs 99.9% SLA). AWS RDS benchmarking due 28 Jun. CIO to present renewal vs migration recommendation to CFO by 30 Jun. Executive decision required by 15 Jul to avoid service continuity gap. Financial impact: R14M p.a. contract vs potential R9M p.a. AWS equivalent.</div>
+          <div class="act-meta"><span class="badge bc">Critical</span><span class="badge bm">Due: 15 Jul</span><span>CIO / CFO</span></div>
+        </div>
+      </div>
+      <div class="act-row">
+        <div class="act-ref">VND-02</div>
+        <div class="act-body">
+          <div class="act-title">Netstar &mdash; fleet telematics contract renewal (expiry 31 Jul)</div>
+          <div class="act-desc">Contract expires 31 Jul 2026. Performance meets SLA. Review meeting 25 Jun. Proposed: 12-month extension at revised pricing (3% increase). Legal to review updated T&Cs. SDM sign-off required. Must be signed before 31 Jul to avoid service lapse on 312 delivery vehicles.</div>
+          <div class="act-meta"><span class="badge bc">Critical</span><span class="badge bm">Due: 25 Jun</span><span>VMO Lead / Legal</span></div>
+        </div>
+      </div>
+      <div class="act-row">
+        <div class="act-ref">VND-03</div>
+        <div class="act-body">
+          <div class="act-title">Zebra Technologies &mdash; formal SLA breach notice and credit recovery</div>
+          <div class="act-desc">Formal SLA breach notice issued 21 Jun per TSA Schedule 4. Label API availability 87.4% vs 99.5% contractual target. R12k credit claim raised. Executive escalation call 24 Jun. RCA report required by 25 Jun. Permanent fix (CHG-8851) targeted 28 Jun. Vendor review post-fix to determine if contract should be extended or retendered.</div>
+          <div class="act-meta"><span class="badge bc">Critical</span><span class="badge bm">RCA: 25 Jun</span><span>VMO Lead / CTO</span></div>
+        </div>
+      </div>
+      <div class="act-row">
+        <div class="act-ref">VND-04</div>
+        <div class="act-body">
+          <div class="act-title">Microsoft &mdash; Power BI Premium capacity upgrade decision (P2 to P3 or autoscale)</div>
+          <div class="act-desc">Current P2 SKU throttling at peak hours (97.1% uptime vs 99.5% SLA). Options: P3 upgrade (+R380k p.a.), autoscale on Gen2 (usage-based), or refresh schedule staggering (no cost). CDO to present recommendation to CIO by 30 Jun. Implementation by 15 Jul before 800 PPU licence expansion on 1 Aug.</div>
+          <div class="act-meta"><span class="badge bh">High</span><span class="badge bm">Due: 30 Jun</span><span>CDO / CIO</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="cb0">
+      <div class="st">Contract renewals due &mdash; next 6 months</div>
+      <div class="tl">
+        <div class="tl-item">
+          <div class="tl-dot" style="background:var(--rt)"></div>
+          <div class="tl-time">25 Jun 2026</div>
+          <div class="tl-actor">VMO Lead / Legal</div>
+          <div class="tl-title">Netstar fleet telematics &mdash; sign renewal</div>
+          <div class="tl-desc">Lapse risk if not signed by 31 Jul. 12-month extension at revised pricing.</div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-dot" style="background:var(--rt)"></div>
+          <div class="tl-time">15 Jul 2026</div>
+          <div class="tl-actor">CIO / CFO</div>
+          <div class="tl-title">Oracle DB &mdash; renewal or migration decision</div>
+          <div class="tl-desc">Contract expires Aug. Renewal or AWS RDS transition plan must be confirmed by 15 Jul.</div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-dot" style="background:var(--ot)"></div>
+          <div class="tl-time">Sep 2026</div>
+          <div class="tl-actor">CDO</div>
+          <div class="tl-title">Collibra data catalogue &mdash; annual renewal</div>
+          <div class="tl-desc">R2.4M p.a. licence. Renewal meeting to be set for Jul. Phase 2 expansion scope to be included.</div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-dot" style="background:var(--ot)"></div>
+          <div class="tl-time">Oct 2026</div>
+          <div class="tl-actor">VP Infrastructure</div>
+          <div class="tl-title">Cisco &mdash; SmartNet support renewal</div>
+          <div class="tl-desc">Annual SmartNet renewal. DC1 switch refresh (CAP-011) will change scope. Cisco account team meeting to be arranged post-capex approval.</div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-dot" style="background:var(--at)"></div>
+          <div class="tl-time">Dec 2026</div>
+          <div class="tl-actor">VP Infrastructure / CIO</div>
+          <div class="tl-title">Dimension Data &mdash; network managed services renewal</div>
+          <div class="tl-desc">R18M p.a. 3-year contract. Benchmark against market before renewal. RFP process to commence Oct 2026 to allow 90-day notice.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+
+<!-- ══════════════════════════════════════════
+     PANEL 6 — INVESTMENT DECISIONS
+═══════════════════════════════════════════ -->
+<div class="panel" id="p6">
+
+  <p class="intro">Technology investment decisions are items requiring formal sign-off from the CTO, CIO, CFO, or Board before investment or contractual commitment can proceed. Decisions below R500k can be approved by the CIO. Decisions R500k&ndash;R5M require TIC and CIO / CFO approval. Decisions above R5M require Board approval. Decisions are time-sensitive &mdash; delay has a simulated financial or strategic impact documented for each item.</p>
+
+  <div class="mrow">
+    <div class="mc"><div class="ml">Decisions Pending (Total)</div><div class="mv v-a">7</div><div class="ms">Awaiting sign-off</div></div>
+    <div class="mc"><div class="ml">Board-Level Decisions</div><div class="mv v-a">3</div><div class="ms">DEC-004, 005, 006 &bull; Aug&ndash;Sep</div></div>
+    <div class="mc"><div class="ml">CIO / CFO / CDO Decisions</div><div class="mv v-a">2</div><div class="ms">DEC-002, 003 &bull; +1 TIC (DEC-007)</div></div>
+    <div class="mc"><div class="ml">CTO Decisions</div><div class="mv v-a">1</div><div class="ms">DEC-001 &bull; due 30 Jun</div></div>
+    <div class="mc"><div class="ml">Combined Value at Stake</div><div class="mv v-a">R17.3M</div><div class="ms">Annual spend, DEC-001 to 004 &amp; 006</div></div>
+    <div class="mc"><div class="ml">Value at Risk if Delayed</div><div class="mv v-r">R2.3M</div><div class="ms">AI + analytics targets</div></div>
+  </div>
+
+  <!-- Decision cards -->
+  <div class="cb">
+    <div class="st">Active investment decisions &mdash; sorted by urgency</div>
+
+    <div class="card" style="border-left-color:var(--rt)">
+      <div class="card-hdr">
+        <span class="card-title">DEC-001 &mdash; Azure GPU reservation for AI Demand Forecasting v2 (R620k p.a.)</span>
+        <span class="badge bc">CTO &mdash; Due 30 Jun</span>
+      </div>
+      <div class="card-sub">Azure NC-series GPU cluster required for Demand Forecasting v2 (AI-013) which is model-complete but cannot be deployed. Business case approved by CFO. R800k annual AI value blocked. If CTO signs by 30 Jun, provisioning completes 15 Jul and model goes live 15 Aug. Each week of delay costs R15k in deferred value. Escalation: CIO to follow up with CTO 27 Jun.</div>
+    </div>
+
+    <div class="card" style="border-left-color:var(--rt)">
+      <div class="card-hdr">
+        <span class="card-title">DEC-002 &mdash; Oracle DB: renew at R14M p.a. vs AWS RDS migration</span>
+        <span class="badge bc">CIO / CFO &mdash; Due 15 Jul</span>
+      </div>
+      <div class="card-sub">Oracle contract expires Aug 2026. SLA breach on record. AWS RDS benchmarking due 28 Jun. Options: (A) Oracle renewal at R14M p.a. (likely +5% increase, 2-year term), (B) AWS RDS migration at ~R9M p.a. (6-month migration, R1.8M one-off cost), (C) hybrid. CIO to present recommendation with financial modelling to CFO by 30 Jun. Decision 15 Jul, ratified at the 16 Jul TIC. Board notification required if option B selected (>R5M budget impact).</div>
+    </div>
+
+    <div class="card" style="border-left-color:var(--rt)">
+      <div class="card-hdr">
+        <span class="card-title">DEC-003 &mdash; Power BI Premium capacity upgrade (P2 to P3: +R380k p.a.)</span>
+        <span class="badge bc">CDO / CIO &mdash; Due 30 Jun</span>
+      </div>
+      <div class="card-sub">Current P2 SKU throttling at peak hours causing 97.1% platform uptime vs 99.5% SLA target. Option A: P3 upgrade (+R380k p.a., guaranteed capacity). Option B: Premium Gen2 autoscale (usage-based, variable cost). Option C: stagger refresh schedules (no cost, operational impact). CDO recommendation required by 30 Jun for implementation before 1 Aug PPU licence expansion.</div>
+    </div>
+
+    <div class="card" style="border-left-color:var(--ot)">
+      <div class="card-hdr">
+        <span class="card-title">DEC-004 &mdash; DC1 core switch replacement capex (R1.4M estimated)</span>
+        <span class="badge bh">CFO / Board &mdash; Submission 10 Jul</span>
+      </div>
+      <div class="card-sub">DC1 Cisco core switch stack reaches end-of-support (EoS) August 2026. No security patches post-EoS creates regulatory and operational risk. Capex motivation (R1.4M) to CFO by 10 Jul for September Board approval. Cisco quote requested. If Board does not approve in Sep, DC1 network will operate on unsupported equipment from Aug 2026. Risk: RSK-027 (High).</div>
+    </div>
+
+    <div class="card" style="border-left-color:var(--ot)">
+      <div class="card-hdr">
+        <span class="card-title">DEC-005 &mdash; AI Ethics Framework Board endorsement (patient-facing AI gate)</span>
+        <span class="badge bh">Board &mdash; 18 Sep 2026</span>
+      </div>
+      <div class="card-sub">Board-approved AI Ethics Framework required before any patient-facing AI use cases (AI-015, 016, 017) can enter production. Combined projected value: R2.7M. Framework draft by DPO due 31 Jul. Consultation Aug. Board Privacy Committee and Board presentation 18 Sep. Technology investment implication: R1.8M of AI development capex already spent (CAP-012) is stranded until this gate clears.</div>
+    </div>
+
+    <div class="card" style="border-left-color:var(--ot)">
+      <div class="card-hdr">
+        <span class="card-title">DEC-006 &mdash; Clinical AI Lead headcount approval (new role, ~R900k p.a.)</span>
+        <span class="badge bh">Board &mdash; Aug 2026</span>
+      </div>
+      <div class="card-sub">New Clinical AI Lead role required to accelerate Clinical function from AI Maturity Level 1. Headcount not in current FY2026 establishment. CDO to prepare headcount motivation for Aug Board. Interim: SC data scientist seconded to Clinical AI from 1 Jul. Without this role, clinical AI capability will not reach Level 2 by Dec 2026 target.</div>
+    </div>
+
+    <div class="card" style="border-left-color:var(--at)">
+      <div class="card-hdr">
+        <span class="card-title">DEC-007 &mdash; SAP S/4HANA migration: proceed to Phase 2 (of a R120M&ndash;R160M programme)</span>
+        <span class="badge bm">TIC &mdash; Oct 2026</span>
+      </div>
+      <div class="card-sub">Feasibility study (CAP-009) completes Sep 2026. TIC to review findings and decide: (A) proceed to full S/4HANA migration (R120M&ndash;R160M 3-year programme), (B) selective module upgrade, (C) defer to FY2028. Decision gates FY2027 budget submission. CFO and CIO to brief Board on outcome at Nov 2026 Board meeting.</div>
+    </div>
+  </div>
+
+  <!-- Decision RACI -->
+  <div class="cb0">
+    <div class="st">Decision authority matrix &mdash; by value threshold</div>
+    <div class="tw" style="margin-bottom:0">
+      <table class="raci-table">
+        <thead>
+          <tr>
+            <td class="raci-hdr" style="text-align:left;width:200px">Decision Threshold</td>
+            <td class="raci-hdr">CTO</td>
+            <td class="raci-hdr">CIO</td>
+            <td class="raci-hdr">CDO</td>
+            <td class="raci-hdr">CFO</td>
+            <td class="raci-hdr">TIC</td>
+            <td class="raci-hdr">Board</td>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="raci-lbl">&lt;R500k (operational)</td>
+            <td class="raci-g">A</td><td class="raci-b">C</td><td class="raci-b">C</td>
+            <td class="raci-n">I</td><td class="raci-n">I</td><td class="raci-n">I</td>
+          </tr>
+          <tr>
+            <td class="raci-lbl">R500k&ndash;R5M (programme)</td>
+            <td class="raci-b">C</td><td class="raci-g">A</td><td class="raci-b">C</td>
+            <td class="raci-g">A</td><td class="raci-g">R</td><td class="raci-n">I</td>
+          </tr>
+          <tr>
+            <td class="raci-lbl">R5M&ndash;R20M (strategic)</td>
+            <td class="raci-b">C</td><td class="raci-b">C</td><td class="raci-b">C</td>
+            <td class="raci-g">A</td><td class="raci-g">R</td><td class="raci-g">A</td>
+          </tr>
+          <tr>
+            <td class="raci-lbl">&gt;R20M (transformation)</td>
+            <td class="raci-b">C</td><td class="raci-b">C</td><td class="raci-b">C</td>
+            <td class="raci-b">C</td><td class="raci-g">R</td><td class="raci-g">A/R</td>
+          </tr>
+          <tr>
+            <td class="raci-lbl">Headcount (new roles)</td>
+            <td class="raci-n">I</td><td class="raci-b">C</td><td class="raci-b">C</td>
+            <td class="raci-g">A</td><td class="raci-n">I</td><td class="raci-g">A/R</td>
+          </tr>
+          <tr>
+            <td class="raci-lbl">Vendor contract &gt;R10M</td>
+            <td class="raci-b">C</td><td class="raci-g">A</td><td class="raci-b">C</td>
+            <td class="raci-g">A</td><td class="raci-g">R</td><td class="raci-n">I</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+
+
+<!-- ══════════════════════════════════════════
+     PANEL 7 — GOVERNANCE & CONTROLS
+═══════════════════════════════════════════ -->
+<div class="panel" id="p7">
+
+  <p class="intro">Technology investment governance ensures that all significant technology spend is subject to appropriate business case approval, benefit tracking, post-implementation review, and audit oversight. The Technology Investment Committee (TIC) is the primary governance body, chaired by the CIO and including the CFO, CDO, CTO, and CRO. The TIC reviews investment performance monthly and escalates to the Board Audit and Risk Committee (ARC) quarterly on items above R5M.</p>
+
+  <div class="mrow">
+    <div class="mc"><div class="ml">TIC Meeting Cadence</div><div class="mv">Monthly</div><div class="ms">3rd Thursday</div></div>
+    <div class="mc"><div class="ml">Last TIC Meeting</div><div class="mv">18 Jun 2026</div><div class="ms">Items: 12</div></div>
+    <div class="mc"><div class="ml">Next TIC Meeting</div><div class="mv">16 Jul 2026</div><div class="ms">Items due: 8</div></div>
+    <div class="mc"><div class="ml">Open TIC Actions</div><div class="mv v-a">18</div><div class="ms">6 overdue</div></div>
+    <div class="mc"><div class="ml">Post-Impl Reviews Due (Q3)</div><div class="mv v-a">4</div><div class="ms">CAP-001, 003, 004, 005</div></div>
+    <div class="mc"><div class="ml">Internal Audit Findings Open</div><div class="mv v-a">6</div><div class="ms">3 High &bull; 3 Medium</div></div>
+    <div class="mc"><div class="ml">ARC Reporting (Next)</div><div class="mv">Sep 2026</div><div class="ms">Q3 Board cycle</div></div>
+    <div class="mc"><div class="ml">Budget Reforecast Due</div><div class="mv v-a">31 Jul 2026</div><div class="ms">H2 opex revision</div></div>
+  </div>
+
+  <div class="cg">
+    <div>
+      <div class="cb">
+        <div class="st">TIC governance structure &mdash; June 2026</div>
+        <div class="owner-grid">
+          <div class="owner-card" style="border-top-color:var(--navy)">
+            <div class="owner-tier">TIC Chair</div>
+            <div class="owner-name">CIO</div>
+            <div class="owner-role">Chief Information Officer (simulated)</div>
+            <div class="stat-row" style="padding:4px 0"><span class="stat-label" style="font-size:11px">Open items owned</span><span class="stat-val" style="font-size:11px">DEC-002, DEC-003</span></div>
+            <div class="stat-row" style="padding:4px 0;border-bottom:none"><span class="stat-label" style="font-size:11px">ARC reporting</span><span class="stat-val" style="font-size:11px">Sep 2026</span></div>
+          </div>
+          <div class="owner-card" style="border-top-color:var(--teal)">
+            <div class="owner-tier">Finance Lead</div>
+            <div class="owner-name">CFO</div>
+            <div class="owner-role">Chief Financial Officer (simulated)</div>
+            <div class="stat-row" style="padding:4px 0"><span class="stat-label" style="font-size:11px">Benefit validation</span><span class="stat-val" style="font-size:11px">Quarterly</span></div>
+            <div class="stat-row" style="padding:4px 0;border-bottom:none"><span class="stat-label" style="font-size:11px">Budget review</span><span class="stat-val" style="font-size:11px">5 Jul 2026</span></div>
+          </div>
+          <div class="owner-card" style="border-top-color:var(--blue)">
+            <div class="owner-tier">Data &amp; AI</div>
+            <div class="owner-name">CDO</div>
+            <div class="owner-role">Chief Data Officer (simulated)</div>
+            <div class="stat-row" style="padding:4px 0"><span class="stat-label" style="font-size:11px">Open decisions</span><span class="stat-val" style="font-size:11px">DEC-001, DEC-003</span></div>
+            <div class="stat-row" style="padding:4px 0;border-bottom:none"><span class="stat-label" style="font-size:11px">AI value at risk</span><span class="stat-val" style="font-size:11px">R2.1M</span></div>
+          </div>
+          <div class="owner-card" style="border-top-color:var(--purple)">
+            <div class="owner-tier">Technology</div>
+            <div class="owner-name">VP Infrastructure</div>
+            <div class="owner-role">CTO delegate</div>
+            <div class="stat-row" style="padding:4px 0"><span class="stat-label" style="font-size:11px">Open decisions</span><span class="stat-val" style="font-size:11px">DEC-001, DEC-004</span></div>
+            <div class="stat-row" style="padding:4px 0;border-bottom:none"><span class="stat-label" style="font-size:11px">Capex at risk</span><span class="stat-val" style="font-size:11px">CAP-010, 011, 012</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Internal audit findings -->
+      <div class="cb0">
+        <div class="st">Open internal audit findings &mdash; technology investment</div>
+        <div class="tw" style="margin-bottom:0">
+          <table class="dt">
+            <thead>
+              <tr>
+                <th>Finding</th>
+                <th>Area</th>
+                <th class="ctr">Severity</th>
+                <th>Owner</th>
+                <th class="ctr">Due</th>
+                <th class="ctr">Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td class="mid">Post-implementation reviews not completed within 90 days for 3 of 4 projects</td><td class="mid">Benefits</td><td class="ctr"><span class="badge bc">High</span></td><td class="mid">CIO</td><td class="ctr">31 Jul</td><td class="ctr"><span class="badge bh">In Progress</span></td></tr>
+              <tr><td class="mid">AI model register incomplete (8 of 17 registered)</td><td class="mid">AI Governance</td><td class="ctr"><span class="badge bc">High</span></td><td class="mid">CDO</td><td class="ctr">31 Aug</td><td class="ctr"><span class="badge bm">Pending</span></td></tr>
+              <tr><td class="mid">Vendor AI due diligence not completed for 3 suppliers</td><td class="mid">Vendor Gov.</td><td class="ctr"><span class="badge bc">High</span></td><td class="mid">CTO / Legal</td><td class="ctr">31 Jul</td><td class="ctr"><span class="badge bm">Pending</span></td></tr>
+              <tr><td class="mid">Technology cost allocation by BU not reconciled monthly</td><td class="mid">Cost Mgmt</td><td class="ctr"><span class="badge bh">Medium</span></td><td class="mid">CFO</td><td class="ctr">31 Aug</td><td class="ctr"><span class="badge bm">Pending</span></td></tr>
+              <tr><td class="mid">Azure cost optimisation opportunities not actioned (R2.5M identified)</td><td class="mid">Cloud</td><td class="ctr"><span class="badge bh">Medium</span></td><td class="mid">CDO / CTO</td><td class="ctr">15 Jul</td><td class="ctr"><span class="badge bm">Pending</span></td></tr>
+              <tr><td class="mid">No formal IT risk appetite statement approved by Board</td><td class="mid">Governance</td><td class="ctr"><span class="badge bh">Medium</span></td><td class="mid">CIO / CRO</td><td class="ctr">Sep 2026</td><td class="ctr"><span class="badge bm">Pending</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:16px">
+      <!-- Governance actions -->
+      <div class="cb">
+        <div class="st">Governance actions &mdash; July TIC agenda items</div>
+        <div class="act-row">
+          <div class="act-ref">TIC-01</div>
+          <div class="act-body">
+            <div class="act-title">Oracle contract decision paper &mdash; renewal vs AWS RDS migration</div>
+            <div class="act-desc">CIO to present financial model and recommendation. Options with NPV comparison over 5 years. CFO co-sign required. Tabled as first agenda item 16 Jul TIC. Board notification if option B (migration) selected.</div>
+            <div class="act-meta"><span class="badge bc">Critical</span><span class="badge bm">TIC: 16 Jul</span></div>
+          </div>
+        </div>
+        <div class="act-row">
+          <div class="act-ref">TIC-02</div>
+          <div class="act-body">
+            <div class="act-title">Clinical IT programme replanning &mdash; revised H2 milestones and benefits</div>
+            <div class="act-desc">CAP-010 is 57% spent with R2M of R18M benefits realised. Head of Clinical and CIO to present revised delivery plan with Q3&ndash;Q4 milestones. Benefits recovery plan required given data quality delays.</div>
+            <div class="act-meta"><span class="badge bc">Critical</span><span class="badge bm">TIC: 16 Jul</span></div>
+          </div>
+        </div>
+        <div class="act-row">
+          <div class="act-ref">TIC-03</div>
+          <div class="act-body">
+            <div class="act-title">Azure cost optimisation review &mdash; R2.5M saving plan</div>
+            <div class="act-desc">Analytics Platform Lead to present findings: idle cluster termination, DWU auto-pause, ADF rationalisation, reserved instances. Savings to be ring-fenced for H2 PPU licence cost. Target: savings activated by 31 Aug.</div>
+            <div class="act-meta"><span class="badge bh">High</span><span class="badge bm">TIC: 16 Jul</span></div>
+          </div>
+        </div>
+        <div class="act-row">
+          <div class="act-ref">TIC-04</div>
+          <div class="act-body">
+            <div class="act-title">Post-implementation reviews &mdash; CAP-001, 003, 004, 005</div>
+            <div class="act-desc">3 of 4 post-implementation reviews overdue (Q2 go-live projects). Finance to lead with business owners. Benefits data to be validated against business case. Any variance &gt;20% triggers recovery plan. Due to TIC 31 Jul per governance policy.</div>
+            <div class="act-meta"><span class="badge bh">High</span><span class="badge bm">Due: 31 Jul</span></div>
+          </div>
+        </div>
+        <div class="act-row">
+          <div class="act-ref">TIC-05</div>
+          <div class="act-body">
+            <div class="act-title">H2 2026 technology opex reforecast &mdash; revised budget submission</div>
+            <div class="act-desc">Current YTD overspend R12M. H2 forecast must account for: 800 PPU licences (R1.92M H2), potential Oracle migration one-off (R1.8M), DC1 switch if approved, and ongoing contractor costs. CFO to review revised opex budget by 31 Jul before H2 locked.</div>
+            <div class="act-meta"><span class="badge bh">High</span><span class="badge bm">Due: 31 Jul</span></div>
+          </div>
+        </div>
+        <div class="act-row">
+          <div class="act-ref">TIC-06</div>
+          <div class="act-body">
+            <div class="act-title">SAP S/4HANA feasibility study findings &mdash; TIC briefing</div>
+            <div class="act-desc">CAP-009 feasibility study completes Sep 2026. TIC to be briefed Oct on go/no-go for full migration programme. Decision gates FY2027 budget. Board briefing Nov 2026. R120M&ndash;R160M programme if approved &mdash; largest tech investment in Group history.</div>
+            <div class="act-meta"><span class="badge bm">Medium</span><span class="badge bm">TIC: Oct 2026</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="cb0">
+        <div class="st">Investment decisions calendar &mdash; H2 2026</div>
+        <div class="tl">
+          <div class="tl-item">
+            <div class="tl-dot" style="background:var(--rt)"></div>
+            <div class="tl-time">30 Jun 2026</div>
+            <div class="tl-title">CTO: GPU decision &bull; CIO / CDO: Power BI capacity decision</div>
+            <div class="tl-desc">Two decisions gating AI and analytics infrastructure expansion.</div>
+          </div>
+          <div class="tl-item">
+            <div class="tl-dot" style="background:var(--rt)"></div>
+            <div class="tl-time">15 Jul 2026</div>
+            <div class="tl-title">CIO / CFO: Oracle renewal vs AWS RDS migration</div>
+            <div class="tl-desc">R14M p.a. contract decision with Board notification if migration selected.</div>
+          </div>
+          <div class="tl-item">
+            <div class="tl-dot" style="background:var(--ot)"></div>
+            <div class="tl-time">16 Jul 2026</div>
+            <div class="tl-title">TIC: Oracle paper &bull; Clinical IT replanning &bull; Azure cost review</div>
+            <div class="tl-desc">July TIC &mdash; 3 critical agenda items requiring committee decisions.</div>
+          </div>
+          <div class="tl-item">
+            <div class="tl-dot" style="background:var(--ot)"></div>
+            <div class="tl-time">31 Jul 2026</div>
+            <div class="tl-title">CFO: H2 opex reforecast locked &bull; TIC: Post-impl reviews</div>
+            <div class="tl-desc">Budget revision to absorb PPU licences, Oracle outcome, and cloud optimisation.</div>
+          </div>
+          <div class="tl-item">
+            <div class="tl-dot" style="background:var(--blue)"></div>
+            <div class="tl-time">Sep 2026 Board</div>
+            <div class="tl-title">Board ARC: DC1 switch capex &bull; AI Ethics Framework &bull; Q2 tech performance</div>
+            <div class="tl-desc">Three Board-level technology items requiring formal resolution.</div>
+          </div>
+          <div class="tl-item">
+            <div class="tl-dot" style="background:var(--blue)"></div>
+            <div class="tl-time">Oct&ndash;Nov 2026</div>
+            <div class="tl-title">TIC / Board: SAP S/4HANA go/no-go decision</div>
+            <div class="tl-desc">Feasibility findings tabled. Largest potential technology investment in Group history.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<section class="portfolio-about" id="about-this-portfolio">
+  <h2>About This Portfolio</h2>
+  <p><strong>Prepared by:</strong> Divan Gerber &mdash; Independent Portfolio Exercise.</p>
+  <p>This page is part of a self-directed learning project built to demonstrate practical Governance, Risk &amp; Compliance and IT Audit capability. &ldquo;MedRetail Group South Africa&rdquo; and its governance structures are fictional constructs created for this exercise. No real organization, department, employee, board, supplier contract, or confidential data is represented here, and the dashboard is a static design prototype, not a live system. Real product and vendor names (listed in the banner above) are scenario context only; every figure, contract term and finding attributed to them is invented and says nothing about their actual products or pricing. Spend, benefit and ROI figures, and the committee, Board and executive decisions and roles shown, are simulated scenario content. This is not a role or office Divan Gerber has held.</p>
+</section>
+
+</body>
+</html>
